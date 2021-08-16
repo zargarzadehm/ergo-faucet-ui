@@ -27,7 +27,7 @@ function App() {
     }
 
     axios
-      .post(baseApi, { address, challenge: captchaData })
+      .post(baseApi, { address, response: captchaData })
       .then(({ data }) => {
         if (data.message === waitError && data.success === false) {
           return;
