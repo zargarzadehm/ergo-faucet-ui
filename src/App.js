@@ -5,7 +5,7 @@ import axios from "axios";
 import { useInterval } from "./hooks/useInterval";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const baseApi = "https://gettoken.ergopool.io/getDexToken";
+const baseApi = "/getErg";
 const waitError = "please wait and try later";
 
 function App() {
@@ -75,6 +75,13 @@ function App() {
           />
         </label>
       </div>
+      <div>
+        <ReCAPTCHA
+            sitekey="6Lec6wMcAAAAAGyzEtT9Sx76iStGz_vk_gd70qvo"
+            theme="dark"
+            onChange={onChange}
+        />
+      </div>
       <div className="main-button-container">
         <button
           className="main-button"
@@ -87,20 +94,20 @@ function App() {
               <span />
             </span>
           ) : (
-            "Get Beta Tokens"
+            "Get Erg On TestNet"
           )}
         </button>
       </div>
       {error && <div className="error">{error}</div>}
       {isLoading && (
         <div className="message">
-          Please wait, you will receive your tokens soon. Do not close the page.
+          Please wait, you will receive your Erg soon. Do not close the page.
           (May take 10-15 minutes)
         </div>
       )}
       {!isLoading && trxUrl && (
         <div className="message">
-          Tokens successfully received.{" "}
+          Erg successfully received.{" "}
           <a
             className="main-link"
             href={trxUrl}
@@ -111,13 +118,6 @@ function App() {
           </a>
         </div>
       )}
-      <div>
-        <ReCAPTCHA
-          sitekey="6LcjdvobAAAAAMe260RL3V0mVHZEALh_eELvw1uW"
-          theme="dark"
-          onChange={onChange}
-        />
-      </div>
     </div>
   );
 }
