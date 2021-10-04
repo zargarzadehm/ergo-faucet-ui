@@ -5,7 +5,7 @@ import axios from "axios";
 import { useInterval } from "./hooks/useInterval";
 import ReCAPTCHA from "react-google-recaptcha";
 
-const BaseUrl = "https://testnet.ergofaucet.org/"
+const BaseUrl = "/"
 const getErgUrl = BaseUrl + "getAsset";
 const supportedTokenUrl = BaseUrl + "supportedAssets"
 const infoUrl = BaseUrl + "info"
