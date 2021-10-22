@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-top: 30vh;
+    padding-top: 10vh;
 }
 
 .main-button-container {
@@ -148,6 +148,10 @@ select.main-input option {
     background-color: transparent;
 }
 
+.header-logo {
+    width: 60%;
+    margin-bottom: 100px;
+}
 .marginHorizontal {
     margin: 20px 0;
 }
@@ -166,5 +170,11 @@ select.main-input option {
         width: 58px;
         height: 58px;
         opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-logo{
+        width: 80%;
     }
 }
