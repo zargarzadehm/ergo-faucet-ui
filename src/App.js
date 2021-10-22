@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useInterval } from "./hooks/useInterval";
 import ReCAPTCHA from "react-google-recaptcha";
-
+import Logo from './ErgoFaucetV2.svg';
 const BaseUrl = "https://testnet.ergofaucet.org/"
 const getErgUrl = BaseUrl + "getAsset";
 const supportedTokenUrl = BaseUrl + "supportedAssets"
@@ -103,6 +103,7 @@ function App() {
                     </li>
                 )) : null}
             </ul>
+            <img src={Logo} alt="React Logo" className="header-logo"/>
             <div className="main-input-container">
                 <label className="main-input-label">
                     Enter wallet address
