@@ -9,6 +9,7 @@ const BaseUrl = "/"
 const getErgUrl = BaseUrl + "getAsset";
 const supportedTokenUrl = BaseUrl + "supportedAssets"
 const infoUrl = BaseUrl + "info"
+const authUrl = BaseUrl + "auth"
 const waitError = "please wait and try later";
 
 function App() {
@@ -30,17 +31,40 @@ function App() {
             }
         })
     }
-    const loadInfo = () => {
-        axios.get(infoUrl).then(response => {
+    const loadInfo = (withCredentials = false) => {
+        axios.get(infoUrl, {withCredentials: withCredentials}).then(response => {
             setInfo(response.data)
-            document.title = response.data.title ? response.data.title: document.title;
+            document.title = response.data.title ? response.data.title : document.title;
         })
     }
     useEffect(() => {
         loadSupportedAsset()
         loadInfo()
     }, [])
+
+    const CreatePopup = () => {
+        const width = 400
+        const height = 650
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2.5;
+        const windowFeatures = `toolbar=0,scrollbars=1,status=1,resizable=0,location=1,
+            menuBar=0,width=${width},height=${height},top=${top},left=${left}`;
+        const popup = window.open(authUrl, "Authentication", windowFeatures);
+        popup.window.focus();
+        window.addEventListener
+        ("message", () => {
+            loadInfo(true)
+        }, false);
+    }
+
     const request = () => {
+
+        if (!info.user) {
+            setIsLoading(false);
+            CreatePopup()
+            return;
+        }
+
         if (!address) {
             setError("Type address");
             setIsLoading(false)
@@ -89,7 +113,8 @@ function App() {
         setCaptchaData(val);
     }
 
-    const btnTitle = info ? info.mainButton : ""
+    const btnTitle = info ? (info.user ? info.mainButton : "Authenticate with discord") : ""
+
     return (
         <div className="container">
             <ul className="navbar">
@@ -135,7 +160,8 @@ function App() {
                 ) : null}
             </div>
             <div className="main-button-container">
-                <button className="main-button" onClick={handleClick} disabled={!captchaData || isLoading}>
+                <button className="main-button" onClick={handleClick}
+                        disabled={isLoading || (info.user && !captchaData)}>
                     {isLoading ? (
                         <span className="loading"/>
                     ) : btnTitle}
