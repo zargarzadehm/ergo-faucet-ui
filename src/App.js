@@ -52,7 +52,7 @@ function App() {
         const popup = window.open(authUrl, "Authentication", windowFeatures);
         popup.window.focus();
         window.addEventListener
-        ("message", () => {
+        ("Authenticated!", (event) => {
             loadInfo(true)
         }, false);
     }
