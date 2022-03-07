@@ -31,8 +31,8 @@ function App() {
             }
         })
     }
-    const loadInfo = (withCredentials = false) => {
-        axios.get(infoUrl, {withCredentials: withCredentials}).then(response => {
+    const loadInfo = () => {
+        axios.get(infoUrl, {withCredentials: true}).then(response => {
             setInfo(response.data)
             document.title = response.data.title ? response.data.title : document.title;
         })
@@ -53,7 +53,7 @@ function App() {
         popup.window.focus();
         window.addEventListener
         ("Authenticated!", (event) => {
-            loadInfo(true)
+            loadInfo()
         }, false);
     }
 
@@ -118,6 +118,11 @@ function App() {
     return (
         <div className="container">
             <ul className="navbar">
+                {info.user ?
+                    <li className="active username">
+                        {info.user.username}
+                    </li>
+                    : null}
                 {info.buttons ? info.buttons.map((description, index) => (
                     <li key={index} className={description.active ? "active" : ""}>
                         {description.active ? description.name : (
@@ -155,7 +160,7 @@ function App() {
                 </label>
             </div>
             <div className="marginHorizontal">
-                {info.siteKey ? (
+                {info.user ? (
                     <ReCAPTCHA sitekey={info.siteKey} theme="dark" onChange={onChange}/>
                 ) : null}
             </div>
