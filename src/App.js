@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./App.css";
 import { useState } from "react";
 import axios from "axios";
@@ -10,6 +10,7 @@ const getErgUrl = BaseUrl + "getAsset";
 const supportedTokenUrl = BaseUrl + "supportedAssets"
 const infoUrl = BaseUrl + "info"
 const authUrl = BaseUrl + "auth"
+const logoutUrl = BaseUrl + "logout"
 const waitError = "please wait and try later";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
     const [error, setError] = useState("");
     const [supportedAsset, setSupportedAsset] = useState({});
     const [info, setInfo] = useState({});
+    const recaptchaRef = useRef(null);
 
     const loadSupportedAsset = () => {
         axios.get(supportedTokenUrl).then(response => {
@@ -42,7 +44,7 @@ function App() {
         loadInfo()
     }, [])
 
-    const CreatePopup = () => {
+    const createPopup = () => {
         const width = 400
         const height = 650
         const left = window.screenX + (window.outerWidth - width) / 2;
@@ -52,16 +54,26 @@ function App() {
         const popup = window.open(authUrl, "Authentication", windowFeatures);
         popup.window.focus();
         window.addEventListener
-        ("Authenticated!", (event) => {
-            loadInfo()
+        ('message', (event) => {
+            if (event.data === 'Authenticated!')
+                loadInfo()
         }, false);
+    }
+
+    const logOut = () => {
+        axios.get(logoutUrl, {withCredentials: true}).then(res => {
+            setError("");
+            loadInfo()
+        }).catch(e => {
+            setError("LogOut Failed");
+        })
     }
 
     const request = () => {
 
         if (!info.user) {
             setIsLoading(false);
-            CreatePopup()
+            createPopup()
             return;
         }
 
@@ -92,6 +104,7 @@ function App() {
                     setIsLoading(false);
                 }
             });
+        return true
     };
 
     useInterval(() => {
@@ -106,7 +119,9 @@ function App() {
 
     function handleClick() {
         setIsLoading(true);
-        request();
+        if (request() && recaptchaRef.current !== null) {
+            recaptchaRef.current.reset()
+        }
     }
 
     function onChange(val) {
@@ -132,6 +147,12 @@ function App() {
                         )}
                     </li>
                 )) : null}
+                {info.user ?
+                    <li>
+                        <a className="nav-item" href="#" onClick={logOut}>Log Out</a>
+
+                    </li>
+                    : null}
             </ul>
             <img src={Logo} alt="React Logo" className="header-logo"/>
             <div className="main-input-container">
@@ -161,7 +182,7 @@ function App() {
             </div>
             <div className="marginHorizontal">
                 {info.user ? (
-                    <ReCAPTCHA sitekey={info.siteKey} theme="dark" onChange={onChange}/>
+                    <ReCAPTCHA ref={recaptchaRef} sitekey={info.siteKey} theme="dark" onChange={onChange}/>
                 ) : null}
             </div>
             <div className="main-button-container">
