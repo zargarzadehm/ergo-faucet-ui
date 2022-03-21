@@ -144,8 +144,8 @@ function App() {
                 )) : null}
                 {info.user ?
                   <div>
-                  <li className="username"> {info.user.username} </li>
                   <li> <a className="nav-item" href="#" onClick={logOut}>Log Out</a> </li>
+                  <li className="username"> {info.user.username} </li>
                   </div>
                   : null }
             </ul>
