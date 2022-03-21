@@ -152,6 +152,10 @@ select.main-input option {
     background-color: transparent;
 }
 
+.navbar li.not-active {
+    float: left;
+}
+
 .header-logo {
     width: 60%;
     margin-bottom: 100px;
