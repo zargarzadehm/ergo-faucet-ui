@@ -133,13 +133,8 @@ function App() {
     return (
         <div className="container">
             <ul className="navbar">
-                {info.user ?
-                    <li className="active username">
-                        {info.user.username}
-                    </li>
-                    : null}
-                {info.buttons ? info.buttons.map((description, index) => (
-                    <li key={index} className={description.active ? "active" : ""}>
+                {info.buttons ? info.buttons.sort((description) => (description.active)).reverse().map((description, index) => (
+                    <li key={index} className={description.active ? "active" : "not-active"}>
                         {description.active ? description.name : (
                             <a className="nav-item" href={description.url}>
                                 {description.name}
@@ -148,11 +143,11 @@ function App() {
                     </li>
                 )) : null}
                 {info.user ?
-                    <li>
-                        <a className="nav-item" href="#" onClick={logOut}>Log Out</a>
-
-                    </li>
-                    : null}
+                  <div>
+                  <li> <a className="nav-item" href="#" onClick={logOut}>Log Out</a> </li>
+                  <li className="username"> {info.user.username} </li>
+                  </div>
+                  : null }
             </ul>
             <img src={Logo} alt="React Logo" className="header-logo"/>
             <div className="main-input-container">
