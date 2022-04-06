@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./App.css";
 import { useState } from "react";
 import axios from "axios";
@@ -9,6 +9,8 @@ const BaseUrl = "/"
 const getErgUrl = BaseUrl + "getAsset";
 const supportedTokenUrl = BaseUrl + "supportedAssets"
 const infoUrl = BaseUrl + "info"
+const authUrl = BaseUrl + "auth"
+const logoutUrl = BaseUrl + "logout"
 const waitError = "please wait and try later";
 
 function App() {
@@ -20,6 +22,7 @@ function App() {
     const [error, setError] = useState("");
     const [supportedAsset, setSupportedAsset] = useState({});
     const [info, setInfo] = useState({});
+    const recaptchaRef = useRef(null);
 
     const loadSupportedAsset = () => {
         axios.get(supportedTokenUrl).then(response => {
@@ -31,16 +34,49 @@ function App() {
         })
     }
     const loadInfo = () => {
-        axios.get(infoUrl).then(response => {
+        axios.get(infoUrl, {withCredentials: true}).then(response => {
             setInfo(response.data)
-            document.title = response.data.title ? response.data.title: document.title;
+            document.title = response.data.title ? response.data.title : document.title;
         })
     }
     useEffect(() => {
         loadSupportedAsset()
         loadInfo()
     }, [])
+
+    const createPopup = () => {
+        const width = 400
+        const height = 650
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2.5;
+        const windowFeatures = `toolbar=0,scrollbars=1,status=1,resizable=0,location=1,
+            menuBar=0,width=${width},height=${height},top=${top},left=${left}`;
+        const popup = window.open(authUrl, "Authentication", windowFeatures);
+        popup.window.focus();
+        window.addEventListener
+        ('message', (event) => {
+            if (event.data === 'Authenticated!')
+                loadInfo()
+        }, false);
+    }
+
+    const logOut = () => {
+        axios.get(logoutUrl, {withCredentials: true}).then(res => {
+            setError("");
+            loadInfo()
+        }).catch(e => {
+            setError("LogOut Failed");
+        })
+    }
+
     const request = () => {
+
+        if (!info.user) {
+            setIsLoading(false);
+            createPopup()
+            return;
+        }
+
         if (!address) {
             setError("Type address");
             setIsLoading(false)
@@ -68,6 +104,7 @@ function App() {
                     setIsLoading(false);
                 }
             });
+        return true
     };
 
     useInterval(() => {
@@ -82,19 +119,22 @@ function App() {
 
     function handleClick() {
         setIsLoading(true);
-        request();
+        if (request() && recaptchaRef.current !== null) {
+            recaptchaRef.current.reset()
+        }
     }
 
     function onChange(val) {
         setCaptchaData(val);
     }
 
-    const btnTitle = info ? info.mainButton : ""
+    const btnTitle = info ? (info.user ? info.mainButton : "Authenticate with discord") : ""
+
     return (
         <div className="container">
             <ul className="navbar">
-                {info.buttons ? info.buttons.map((description, index) => (
-                    <li key={index} className={description.active ? "active" : ""}>
+                {info.buttons ? info.buttons.sort((description) => (description.active)).reverse().map((description, index) => (
+                    <li key={index} className={description.active ? "active" : "not-active"}>
                         {description.active ? description.name : (
                             <a className="nav-item" href={description.url}>
                                 {description.name}
@@ -102,6 +142,12 @@ function App() {
                         )}
                     </li>
                 )) : null}
+                {info.user ?
+                  <div>
+                  <li> <a className="nav-item" href="#" onClick={logOut}>Log Out</a> </li>
+                  <li className="username"> {info.user.username} </li>
+                  </div>
+                  : null }
             </ul>
             <img src={Logo} alt="React Logo" className="header-logo"/>
             <div className="main-input-container">
@@ -130,12 +176,13 @@ function App() {
                 </label>
             </div>
             <div className="marginHorizontal">
-                {info.siteKey ? (
-                    <ReCAPTCHA sitekey={info.siteKey} theme="dark" onChange={onChange}/>
+                {info.user ? (
+                    <ReCAPTCHA ref={recaptchaRef} sitekey={info.siteKey} theme="dark" onChange={onChange}/>
                 ) : null}
             </div>
             <div className="main-button-container">
-                <button className="main-button" onClick={handleClick} disabled={!captchaData || isLoading}>
+                <button className="main-button" onClick={handleClick}
+                        disabled={isLoading || (info.user && !captchaData)}>
                     {isLoading ? (
                         <span className="loading"/>
                     ) : btnTitle}

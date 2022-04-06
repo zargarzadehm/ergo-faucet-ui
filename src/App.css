@@ -137,6 +137,10 @@ select.main-input option {
     /*background-color: #dddddd;*/
 }
 
+.navbar li.username {
+    color: red;
+}
+
 .navbar li:hover {
     background-color: #999;
 }
@@ -146,6 +150,10 @@ select.main-input option {
 }
 .navbar li.active:hover{
     background-color: transparent;
+}
+
+.navbar li.not-active {
+    float: left;
 }
 
 .header-logo {
