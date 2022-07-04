@@ -129,7 +129,7 @@ function App() {
         setCaptchaData(val);
     }
 
-    const btnTitle = info ? ((info.user || info.discordRequired) ? info.mainButton : "Authenticate with discord") : ""
+    const btnTitle = info ? ((info.user || !info.discordRequired) ? info.mainButton : "Authenticate with discord") : ""
 
     return (
         <div className="container">
@@ -177,7 +177,7 @@ function App() {
                 </label>
             </div>
             <div className="marginHorizontal">
-                {info.user || info.discordRequired ? (
+                {info.user || !info.discordRequired ? (
                     <ReCAPTCHA ref={recaptchaRef} sitekey={info.siteKey} theme="dark" onChange={onChange}/>
                 ) : null}
             </div>
