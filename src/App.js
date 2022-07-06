@@ -72,7 +72,7 @@ function App() {
 
     const request = () => {
 
-        if (!info.user) {
+        if (!info.user && info.discordRequired) {
             setIsLoading(false);
             createPopup()
             return;
