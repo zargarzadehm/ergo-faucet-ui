@@ -134,7 +134,7 @@ function App() {
     return (
         <div className="container">
             <ul className="navbar">
-                {info.buttons ? info.buttons.sort((description) => (description.active)).reverse().map((description, index) => (
+                {info.buttons ? info.buttons.sort((description) => (description.active ? -1 : 1)).map((description, index) => (
                     <li key={index} className={description.active ? "active" : "not-active"}>
                         {description.active ? description.name : (
                             <a className="nav-item" href={description.url}>
