@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, {useEffect, useRef} from "react";
 import "./App.css";
-import { useState } from "react";
+import {useState} from "react";
 import axios from "axios";
-import { useInterval } from "./hooks/useInterval";
+import {useInterval} from "./hooks/useInterval";
 import ReCAPTCHA from "react-google-recaptcha";
 import Logo from './ErgoFaucetV2.svg';
+
 const BaseUrl = "/"
 const getErgUrl = BaseUrl + "getAsset";
 const supportedTokenUrl = BaseUrl + "supportedAssets"
@@ -71,7 +72,7 @@ function App() {
 
     const request = () => {
 
-        if (!info.user) {
+        if (!info.user && info.discordRequired) {
             setIsLoading(false);
             createPopup()
             return;
@@ -128,12 +129,12 @@ function App() {
         setCaptchaData(val);
     }
 
-    const btnTitle = info ? (info.user ? info.mainButton : "Authenticate with discord") : ""
+    const btnTitle = info ? ((info.user || !info.discordRequired) ? info.mainButton : "Authenticate with discord") : ""
 
     return (
         <div className="container">
             <ul className="navbar">
-                {info.buttons ? info.buttons.sort((description) => (description.active)).reverse().map((description, index) => (
+                {info.buttons ? info.buttons.sort((description) => (description.active ? -1 : 1)).map((description, index) => (
                     <li key={index} className={description.active ? "active" : "not-active"}>
                         {description.active ? description.name : (
                             <a className="nav-item" href={description.url}>
@@ -143,11 +144,11 @@ function App() {
                     </li>
                 )) : null}
                 {info.user ?
-                  <div>
-                  <li> <a className="nav-item" href="#" onClick={logOut}>Log Out</a> </li>
-                  <li className="username"> {info.user.username} </li>
-                  </div>
-                  : null }
+                    <div>
+                        <li><a className="nav-item" href="#" onClick={logOut}>Log Out</a></li>
+                        <li className="username"> {info.user.username} </li>
+                    </div>
+                    : null}
             </ul>
             <img src={Logo} alt="React Logo" className="header-logo"/>
             <div className="main-input-container">
@@ -176,13 +177,13 @@ function App() {
                 </label>
             </div>
             <div className="marginHorizontal">
-                {info.user ? (
+                {info.user || !info.discordRequired ? (
                     <ReCAPTCHA ref={recaptchaRef} sitekey={info.siteKey} theme="dark" onChange={onChange}/>
                 ) : null}
             </div>
             <div className="main-button-container">
                 <button className="main-button" onClick={handleClick}
-                        disabled={isLoading || (info.user && !captchaData)}>
+                        disabled={isLoading || ((info.user && info.discordRequired) && !captchaData)}>
                     {isLoading ? (
                         <span className="loading"/>
                     ) : btnTitle}
